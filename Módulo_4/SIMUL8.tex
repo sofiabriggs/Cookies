@@ -1,0 +1,158 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Junio 2025}
+\lhead{Grupo Cookies}
+\cfoot{\thepage}
+
+\title{\textbf{Informe: Integración de SIMUL8}}
+\author{Grupo Cookies \\
+Carrera: Ingeniería Industrial - 4to año \\
+Facultad de Ingeniería, Universidad Nacional de Cuyo}
+\date{Junio 2025}
+
+\begin{document}
+
+\maketitle
+\hrule
+\vspace{1em}
+\section*{Materia: Técnicas y Herramientas Modernas}
+\vspace{1em}
+\hrule
+
+\section{Introducción}
+
+En el contexto de la simulación de procesos productivos y de servicios, \textbf{SIMUL8} se presenta como una herramienta gráfica poderosa y accesible para modelar sistemas discretos. Este informe tiene como objetivo presentar los conceptos fundamentales de construcción de modelos en SIMUL8, sus capacidades básicas y su aplicación en escenarios reales como un restaurante.
+
+\section{Construcción básica de una cadena en SIMUL8}
+
+La construcción de un modelo en SIMUL8 se basa en conectar \textbf{objetos gráficos} que representan elementos del sistema:
+
+\begin{itemize}
+    \item \textbf{Work Entry Point}: punto de entrada de las entidades (clientes, productos, etc.).
+    \item \textbf{Work Centers}: representan estaciones de trabajo o procesos donde se consume tiempo y recursos.
+    \item \textbf{Queues}: colas donde se almacenan las entidades cuando el centro de trabajo está ocupado.
+    \item \textbf{Work Exit Point}: representa la salida del sistema.
+\end{itemize}
+
+El flujo básico de una cadena es:
+
+\textbf{Entrada → Cola → Proceso → Salida}
+
+Cada componente se conecta mediante flechas que representan la dirección del flujo de las entidades.
+
+\section{Capacidad básica}
+
+La \textbf{capacidad} en SIMUL8 puede referirse a:
+
+\begin{itemize}
+    \item La \textbf{cantidad de recursos} disponibles en un Work Center (por ejemplo, número de empleados, máquinas).
+    \item El \textbf{tamaño máximo} de una cola (por defecto es infinita, pero se puede limitar).
+    \item El \textbf{número de entidades} que pueden ser procesadas simultáneamente.
+\end{itemize}
+
+Este parámetro es clave para simular cuellos de botella o restricciones operativas reales.
+
+\section{Tiempo de vida y distribución de probabilidad}
+
+Cada Work Center puede tener asignado un \textbf{tiempo de procesamiento}, que puede definirse como:
+
+\begin{itemize}
+    \item Fijo (por ejemplo, 5 minutos por cliente).
+    \item Distribución estadística:
+    \begin{itemize}
+        \item \textbf{Exponencial} (tiempos entre llegadas o servicios en colas).
+        \item \textbf{Normal} (cuando se espera una variabilidad simétrica).
+        \item \textbf{Uniforme}, \textbf{Triangular}, entre otras.
+    \end{itemize}
+\end{itemize}
+
+Estas distribuciones permiten reflejar la \textbf{variabilidad real} de los procesos, algo que sería imposible modelar sólo con promedios.
+
+El \textbf{tiempo de vida} puede entenderse como el tiempo que una entidad pasa dentro del sistema completo, desde la entrada hasta la salida.
+
+\section{Routing In y Routing Out}
+
+\subsection*{Routing In}
+
+Define \textbf{cómo una entidad elige un Work Center} al cual ingresar desde una cola o punto anterior. Puede ser:
+
+\begin{itemize}
+    \item \textbf{Cualquiera disponible} (por defecto).
+    \item Por \textbf{prioridad}.
+    \item Por \textbf{mínimo contenido} (la cola menos llena).
+    \item \textbf{Condicional}, usando lógica de decisiones.
+\end{itemize}
+
+\subsection*{Routing Out}
+
+Define \textbf{a dónde se dirige una entidad} después de ser procesada:
+
+\begin{itemize}
+    \item Al siguiente Work Center disponible.
+    \item Según probabilidades.
+    \item Por condiciones o atributos.
+\end{itemize}
+
+Esto permite modelar flujos complejos, decisiones lógicas o incluso fallas/retrabajos.
+
+\section{Aplicación: Caso de un Restaurante}
+
+Un restaurante es un caso clásico para simular en SIMUL8, por su \textbf{flujo estructurado pero variable}. Ejemplo de elementos a modelar:
+
+\begin{itemize}
+    \item \textbf{Entrada de clientes} (Work Entry Point), según una distribución de llegada (ej: exponencial).
+    \item \textbf{Cola para ser atendido}.
+    \item \textbf{Asignación de mesa / camarero (Work Center)}.
+    \item \textbf{Cocina} (otro Work Center con recursos limitados y tiempos variables).
+    \item \textbf{Entrega de pedido y consumo} (se puede modelar como otro proceso).
+    \item \textbf{Pago y salida} (Work Exit Point).
+\end{itemize}
+
+\subsection*{Elementos importantes a considerar}
+
+\begin{itemize}
+    \item Capacidad limitada de mesas.
+    \item Variabilidad en el tiempo de preparación.
+    \item Posibilidad de abandonar si la espera es muy larga (renuncia o \textit{balking}).
+    \item Diferenciación por tipo de cliente o plato (atributos).
+\end{itemize}
+
+\subsection*{Profundizando en la simulación del restaurante}
+
+Para modelar de forma realista un restaurante en SIMUL8, se pueden seguir estos pasos:
+
+\begin{enumerate}
+    \item \textbf{Definir tipos de clientes} con distintos comportamientos (por ejemplo: almuerzo rápido vs. cena completa).
+    \item \textbf{Asignar atributos} a las entidades, como tipo de comida pedida, que influirá en el tiempo de cocina.
+    \item \textbf{Crear distintos Work Centers} para cada etapa: recepción, asignación de mesa, cocina, entrega, pago.
+    \item \textbf{Usar lógicas condicionales} para direccionar el flujo según si hay disponibilidad o no (por ejemplo: si no hay mesas, esperar en cola; si espera > X tiempo, abandonar).
+    \item \textbf{Implementar horarios de mayor demanda} (picos de llegadas al mediodía o noche).
+    \item \textbf{Configurar reportes} para analizar tiempo promedio en el sistema, utilización de recursos, cantidad de clientes perdidos, etc.
+\end{enumerate}
+
+Este tipo de simulación permite evaluar decisiones como:
+
+\begin{itemize}
+    \item Contratar más camareros o cocineros.
+    \item Optimizar el \textit{layout} para reducir tiempos de espera.
+    \item Diseñar una carta que balancee la carga de trabajo en cocina.
+\end{itemize}
+
+\section{Conclusiones}
+
+SIMUL8 permite al ingeniero industrial construir modelos flexibles, visuales y estadísticamente robustos de sistemas reales. 
+
+
+
+\end{document}
